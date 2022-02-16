@@ -148,12 +148,29 @@ contract ERC721Token is ERC721 {
     mapping(uint => address) private idToApproved;
     mapping(address => mapping(address => bool)) private ownerToOperators;
     bytes4 internal constant MAGIC_ON_ERC721_RECEIVED = 0x150b7a02;
+    mapping(uint => string) private tokenURIs;
+    string public name;
+    string public symbol;
+    string public tokenURIBase;
+
+    constructor(
+      string memory _name, 
+      string memory _symbol,
+      string memory _tokenURIBase) public {
+      name = _name;
+      symbol = _symbol;
+      tokenURIBase = _tokenURIBase;
+    }
+
+    function tokenURI(uint _tokenId) external view returns(string memory) {
+      return string(abi.encodePacked(tokenURIBase, _tokenId));
+    }
     
     function balanceOf(address _owner) external view returns(uint) {
         return ownerToTokenCount[_owner];
     }
     
-    function ownerOf(uint256 _tokenId) external view returns (address) {
+    function ownerOf(uint256 _tokenId) public view returns (address) {
         return idToOwner[_tokenId];
     }
     
@@ -205,6 +222,13 @@ contract ERC721Token is ERC721 {
         ownerToTokenCount[_to] += 1;
         idToOwner[_tokenId] = _to;
         emit Transfer(_from, _to, _tokenId);
+    }
+
+    function _mint(address _owner, uint _tokenId) internal {
+        require(idToOwner[_tokenId] == address(0), 'This token already exist..');
+        idToOwner[_tokenId] = owner;
+        ownerToTokenCount[owner] += 1;
+        emit Transfer(address(0), owner, _tokenId);
     }
     
     modifier canTransfer(uint _tokenId) {
