@@ -1,4 +1,4 @@
-pragma solidity ^0.7.7;
+pragma solidity ^0.5.7;
 
 interface ERC20Interface {
     function transfer(address to, uint tokens) external returns (bool success);

@@ -1,4 +1,4 @@
-pragma solidity ^0.7.2;
+pragma solidity ^0.5.2;
 
 contract Escrow{
   address public payer;
