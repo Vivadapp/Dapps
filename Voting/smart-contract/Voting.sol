@@ -1,5 +1,4 @@
-pragma solidity ^0.5.2;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 contract Voting {
   mapping(address => bool) public voters;

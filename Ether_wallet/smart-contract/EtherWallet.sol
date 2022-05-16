@@ -1,9 +1,9 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 contract EtherWallet {
   address payable public owner;
 
-  constructor(address payable _owner) public {
+  constructor(address payable _owner) {
     owner = _owner;
   }
 

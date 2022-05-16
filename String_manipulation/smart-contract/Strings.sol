@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.8.0;
 
 contract Strings {
   function length(string memory str) pure public returns(uint) {

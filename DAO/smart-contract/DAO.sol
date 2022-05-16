@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.8.0;
 
 /**
  * DAO contract:
@@ -35,17 +35,16 @@ contract DAO {
   constructor(
     uint contributionTime, 
     uint _voteTime,
-    uint _quorum) 
-    public {
+    uint _quorum) {
     require(_quorum > 0 && _quorum < 100, 'quorum must be between 0 and 100');
-    contributionEnd = now + contributionTime;
+    contributionEnd = block.timestamp + contributionTime;
     voteTime = _voteTime;
     quorum = _quorum;
     admin = msg.sender;
   }
 
   function contribute() payable external {
-    require(now < contributionEnd, 'cannot contribute after contributionEnd');
+    require(block.timestamp < contributionEnd, 'cannot contribute after contributionEnd');
     investors[msg.sender] = true;
     shares[msg.sender] += msg.value;
     totalShares += msg.value;
@@ -57,7 +56,7 @@ contract DAO {
     require(availableFunds >= amount, 'not enough available funds');
     shares[msg.sender] -= amount;
     availableFunds -= amount;
-    msg.sender.transfer(amount);
+    payable(msg.sender).transfer(amount);
   }
     
   function transferShare(uint amount, address to) external {
@@ -80,7 +79,7 @@ contract DAO {
       amount,
       recipient,
       0,
-      now + voteTime,
+      block.timestamp + voteTime,
       false
     );
     availableFunds -= amount;
@@ -90,17 +89,16 @@ contract DAO {
   function vote(uint proposalId) external onlyInvestors() {
     Proposal storage proposal = proposals[proposalId];
     require(votes[msg.sender][proposalId] == false, 'investor can only vote once for a proposal');
-    require(now < proposal.end, 'can only vote until proposal end date');
+    require(block.timestamp < proposal.end, 'can only vote until proposal end date');
     votes[msg.sender][proposalId] = true;
     proposal.votes += shares[msg.sender];
   }
 
   function executeProposal(uint proposalId) external onlyAdmin() {
     Proposal storage proposal = proposals[proposalId];
-    require(now >= proposal.end, 'cannot execute proposal before end date');
+    require(block.timestamp >= proposal.end, 'cannot execute proposal before end date');
     require(proposal.executed == false, 'cannot execute proposal already executed');
-    require((proposal.votes * 100) / totalShares >= quorum, 'cannot execute proposal with votes # below quorum');
-    proposal.executed = true;
+    require((proposal.votes / totalShares) * 100 >= quorum, 'cannot execute proposal with votes # below quorum');
     _transferEther(proposal.amount, proposal.recipient);
   }
 
@@ -115,7 +113,7 @@ contract DAO {
   }
 
   //For ether returns of proposal investments
-  function() payable external {
+  receive() external payable {
     availableFunds += msg.value;
   }
 
