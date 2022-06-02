@@ -43,6 +43,10 @@ contract DAO {
     admin = msg.sender;
   }
 
+  function startContributionTime(uint contributionTime) external onlyAdmin() {
+    contributionEnd = block.timestamp + contributionTime;
+  }
+
   function contribute() payable external {
     require(block.timestamp < contributionEnd, 'cannot contribute after contributionEnd');
     investors[msg.sender] = true;
@@ -56,6 +60,7 @@ contract DAO {
     require(availableFunds >= amount, 'not enough available funds');
     shares[msg.sender] -= amount;
     availableFunds -= amount;
+    totalShares -= amount;
     payable(msg.sender).transfer(amount);
   }
     
