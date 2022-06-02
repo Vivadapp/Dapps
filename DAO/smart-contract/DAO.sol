@@ -33,11 +33,9 @@ contract DAO {
   address public admin;
 
   constructor(
-    uint contributionTime, 
     uint _voteTime,
     uint _quorum) {
     require(_quorum > 0 && _quorum < 100, 'quorum must be between 0 and 100');
-    contributionEnd = block.timestamp + contributionTime;
     voteTime = _voteTime;
     quorum = _quorum;
     admin = msg.sender;
